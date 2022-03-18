@@ -1,111 +1,60 @@
 #  .ExternalHelp Posh-Shodan.Help.xml
-function Get-ShodanHostService
-{
-    [CmdletBinding(DefaultParameterSetName = 'Direct')]
+function Get-ShodanHostService {
+    [CmdletBinding(
+        DefaultParameterSetName = 'Direct'
+    )]
     Param
     (
-        # Shodan developer API key
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
-        $APIKey,
-
-        [Parameter(Mandatory=$true,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$true,
-                   ParameterSetName = 'Direct')]
+        [Parameter(Mandatory)]
         [string]
         $IPAddress,
 
         # All historical banners should be returned.
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
         [switch]
         $History,
 
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
+        # Only return the list of ports and the general host information, no banners
+        [switch]
+        $Minify,
+
+        # Shodan developer API key
+        [String]
+        $ApiKey,
+
+        [String]
         $CertificateThumbprint,
 
-        [Parameter(Mandatory=$true,
-                   ParameterSetName = 'Proxy')]
-        [string]
+        [Parameter(Mandatory, ParameterSetName = 'Proxy')]
+        [String]
         $Proxy,
- 
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
+
+        [Parameter(ParameterSetName = 'Proxy')]
         [Management.Automation.PSCredential]
         $ProxyCredential,
 
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
+        [Parameter(ParameterSetName = 'Proxy')]
         [Switch]
         $ProxyUseDefaultCredentials
     )
-
-    Begin
-    {
-        if (!(Test-Path variable:Global:ShodanAPIKey ) -and !($APIKey))
-        {
-            throw 'No Shodan API Key has been specified or set.'
+    begin {
+        $Body = @{}
+        if ($PSBoundParameters.ContainsKey('History') -and ($History -eq $true)) {
+            $Body['history'] = 'True'
         }
-        elseif ((Test-Path variable:Global:ShodanAPIKey ) -and !($APIKey))
-        {
-            $APIKey = $Global:ShodanAPIKey
+        if ($PSBoundParameters.ContainsKey('Minify') -and ($Minify -eq $true)) {
+            $Body['minify'] = 'True'
         }
-
-        $Body = @{'key'= $APIKey; 'ip' = $IPAddress}
-
-        if ($History)
-        {
-            $Body.add('history','True')
+        $InvokeParameters = @{
+            'Method'     = 'GET'
+            'Uri'        = "https://api.shodan.io/shodan/host/$($IPAddress)"
+            'PSTypeName' = 'Shodan.Host.Info'
+            'Body'       = $Body
         }
-
-        # Start building parameters for REST Method invokation.
-        $Params =  @{}
-        $Params.add('Body', $Body)
-        $Params.add('Method', 'Get')
-        $Params.add('Uri',[uri]"https://api.shodan.io/shodan/host/$($IPAddress)")
-
-        # Check if connection will be made thru a proxy.
-        if ($PsCmdlet.ParameterSetName -eq 'Proxy')
-        {
-            $Params.Add('Proxy', $Proxy)
-
-            if ($ProxyCredential)
-            {
-                $Params.Add('ProxyCredential', $ProxyCredential)
-            }
-
-            if ($ProxyUseDefaultCredentials)
-            {
-                $Params.Add('ProxyUseDefaultCredentials', $ProxyUseDefaultCredentials)
-            }
-        }
-
-        # Check if we will be doing certificate pinning by checking the certificate thumprint.
-        if ($CertificateThumbprint)
-        {
-            $Params.Add('CertificateThumbprint', $CertificateThumbprint)
-        }
+        $InvokeParameters = Add-ShodanPassthroughParameter -FromHashtable $PSBoundParameters -ToHashTable $InvokeParameters
     }
-    Process
-    {
-        $ReturnedObject = Invoke-RestMethod @Params
-        if ($ReturnedObject)
-        {
-            $ReturnedObject.pstypenames.insert(0,'Shodan.Host.Info')
-            $ReturnedObject
-        }
+    process {
+        Invoke-ShodanRestMethod @InvokeParameters
     }
-    End
-    {
+    end {
     }
 }

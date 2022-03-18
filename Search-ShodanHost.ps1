@@ -1,390 +1,220 @@
 #  .ExternalHelp Posh-Shodan.Help.xml
-function Search-ShodanHost
-{
-    [CmdletBinding(DefaultParameterSetName = 'Direct')]
-    Param
-    (
+function Search-ShodanHost {
+    [CmdletBinding(
+        DefaultParameterSetName = 'Direct'
+    )]
+    param (
        # Shodan developer API key
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
-        $APIKey,
+        [String]
+        $ApiKey,
 
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
+        [String]
         $CertificateThumbprint,
 
-        [Parameter(Mandatory=$true,
-                   ParameterSetName = 'Proxy')]
-        [string]
+        [Parameter(Mandatory, ParameterSetName = 'Proxy')]
+        [String]
         $Proxy,
- 
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
+
+        [Parameter(ParameterSetName = 'Proxy')]
         [Management.Automation.PSCredential]
         $ProxyCredential,
 
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
+        [Parameter(ParameterSetName = 'Proxy')]
         [Switch]
         $ProxyUseDefaultCredentials,
 
          # Text to query for.
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
-        $Query = '',
+        [String]
+        $Query,
 
         #  Find devices located in the given city. It's best combined with the
-        # 'Country' filter to make sure you get the city in the country you 
+        # 'Country' filter to make sure you get the city in the country you
         # want (city names are not always unique).
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
+        [String]
         $City,
 
         # Narrow results down by country.
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
+        [String]
         $Country,
 
         # Latitude and longitude.
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
+        [String]
         $Geo,
 
         # Search for hosts that contain the value in their hostname.
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
+        [String]
         $Hostname,
-        
-        # Limit the search results to a specific IP or subnet. It uses CIDR 
+
+        # Limit the search results to a specific IP or subnet. It uses CIDR
         # notation to designate the subnet range.
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
+        [String]
         $Net,
 
         # Specific operating systems. Common possible values are: windows,
         # linux and cisco.
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-                   ParameterSetName = 'Direct')]
-        [string]
+        [String]
         $OS,
 
         # Search the HTML of the website for the given value.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$HTML,
+        [String]
+        $Html,
 
         # Find devices based on the upstream owner of the IP netblock.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$ISP,
+        [String]
+        $Isp,
 
-        # The network link type. Possible values are: "Ethernet or modem", 
+        # The network link type. Possible values are: "Ethernet or modem",
         # "generic tunnel or VPN", "DSL", "IPIP or SIT", "SLIP", "IPSec or
         # "GRE", "VLAN", "jumbo Ethernet", "Google", "GIF", "PPTP", "loopback",
         # "AX.25 radio modem".
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [ValidateSet( 'Ethernet or modem', 'generic tunnel or VPN', 'DSL', 
+        [ValidateSet(
+            'Ethernet or modem', 'generic tunnel or VPN', 'DSL',
             'IPIP or SIT', 'SLIP', 'IPSec or GRE', 'VLAN', 'jumbo Ethernet',
-            'Google', 'GIF', 'PPTP', 'loopback', 'AX.25 radio modem')]
-        [string[]]$Link,
+            'Google', 'GIF', 'PPTP', 'loopback', 'AX.25 radio modem'
+        )]
+        [String[]]
+        $Link,
 
-        #Find NTP servers that had the given IP in their monlist.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$NTP_IP,
+        #Find Ntp servers that had the given IP in their monlist.
+        [String]
+        $Ntp_IP,
 
-        # Find NTP servers that return the given number of IPs in the initial monlist response.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$NTP_IP_Count,
+        # Find Ntp servers that return the given number of IPs in the initial monlist response.
+        [String]
+        $Ntp_IP_Count,
 
-        # Find NTP servers that had IPs with the given port in their monlist.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [int]$NTP_Port,
+        # Find Ntp servers that had IPs with the given port in their monlist.
+        [Int]
+        $Ntp_Port,
 
-        # Whether or not more IPs were available for the given NTP server.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [switch]$NTP_More,
+        # Whether or not more IPs were available for the given Ntp server.
+        [Switch]
+        $Ntp_More,
 
         # Find devices based on the owner of the IP netblock.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$Org,
+        [String]
+        $Org,
 
         # Filter using the name of the software/ product; ex: product:Apache
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$Product,
+        [String]
+        $Product,
 
         # Filter the results to include only products of the given version; ex: product:apache version:1.3.37
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$Version,
+        [String]
+        $Version,
 
         # Search the title of the website.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$Title,
+        [String]
+        $Title,
 
         # Port number  to narrow the search to specific services.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$Port,
+        [String]
+        $Port,
 
         # Limit search for data that was collected before the given date in
         # format day/month/year.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$Before,
+        [String]
+        $Before,
 
         # Limit search for data that was collected after the given date in
         # format day/month/year.
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$After,
+        [String]
+        $After,
 
         # The page number to page through results 100 at a time. Overrides the
         # "offset" and "limit" parameters if they were provided (default: 1)
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [int]$Page,
+        [Int]
+        $Page,
 
         # The positon from which the search results should be returned (default: 0)
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [int]$Offset,
+        [Int]
+        $Offset,
 
         # The number of results to be returned default(100)
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [int]$Limit,
+        [Int]
+        $Limit,
 
         # True or False; whether or not to truncate some of the larger fields (default: True)
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [bool]$Minify = $true,
+        [Bool]
+        $Minify = $true,
 
-        # A comma-separated list of properties to get summary information on. Property names 
+        # A comma-separated list of properties to get summary information on. Property names
         # can also be in the format of "property:count", where "count" is the number of facets
         # that will be returned for a property (i.e. "country:100" to get the top 100 countries
         # for a search query).
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Proxy')]
-        [Parameter(Mandatory=$false,
-        ParameterSetName = 'Direct')]
-        [string]$Facets
+        [String]
+        $Facets
 
     )
 
-    Begin
-    {
-        if (!(Test-Path variable:Global:ShodanAPIKey ) -and !($APIKey))
-        {
-            throw 'No Shodan API Key has been specified or set.'
+    begin {
+        $QueryDefinionHash = @{
+            'City'         = { "city:'$($City.Trim())'" }
+            'Country'      = { "country_name:`'$($Country.Trim())`'" }
+            'Geo'          = { "geo:$($Geo.Trim())" }
+            'Hostname'     = { "hostname:$($Hostname.Trim())" }
+            'Net'          = { "net:$($Net.Trim())" }
+            'OS'           = { "os:$($OS.Trim())" }
+            'Port'         = { "port:$($Port.Trim())" }
+            'Before'       = { "before:$($Before.Trim())" }
+            'After'        = { "after:$($After.Trim())" }
+            'Html'         = { "html:$($Html.Trim())" }
+            'Isp'          = { "isp:`'$($Isp.Trim())`'" }
+            'Link'         = { "link:$($Link.join(','))" }
+            'Org'          = { "org:$($Org.Trim())" }
+            'Ntp_IP'       = { "Ntp.ip:$($Ntp_IP.Trim())" }
+            'Ntp_IP_Count' = { "Ntp.ip_count:$($Ntp_IP_Count.Trim())" }
+            'Ntp_More'     = { "Ntp.more:$Ntp_More" }
+            'Ntp_Port'     = { "Ntp.port:$($Ntp_Port.Trim())" }
+            'Title'        = { "title:$($Title.Trim())" }
+            'Version'      = { "version:$($Version.Trim())" }
+            'Product'      = { "product:$($Product.Trim())" }
         }
-        elseif ((Test-Path -Path variable:Global:ShodanAPIKey ) -and !($APIKey))
-        {
-            $APIKey = $Global:ShodanAPIKey
+        if ($PSBoundParameters.ContainsKey('Query') -and ('' -ne $Query) -and ($null -ne $Query)) {
+            $LocalQuery = @( $Query )
         }
-
-         # Create the query string to execute.
-        if ($City) {$Query += " city:'$($City.Trim())'"}
-
-        if ($Country) {$Query += " country_name:`'$($Country.Trim())`'"}
-
-        if ($Geo) {$Query += " geo:$($Geo.Trim())"}
-
-        if ($Hostname) {$Query += " hostname:$($Hostname.Trim())"}
-
-        if ($Net) {$Query += " net:$($Net.Trim())"}
-
-        if ($OS) {$Query += " os:$($OS.Trim())"}
-
-        if ($Port) {$Query += " port:$($Port.Trim())"}
-
-        if ($Before) {$Query += " before:$($Before.Trim())"}
-
-        if ($After) {$Query += " after:$($After.Trim())"}
-
-        if ($HTML) {$Query += " html:$($HTML.Trim())"}
-
-        if ($ISP) {$Query += " isp:`'$($ISP.Trim())`'"}
-
-        if ($Link) {$Query += " link:$($Link.join(','))"}
-
-        if ($Org) {$Query += " org:$($Org.Trim())"}
-
-        if ($NTP_IP) {$Query += " ntp.ip:$($NTP_IP.Trim())"}
-
-        if ($NTP_IP_Count) {$Query += " ntp.ip_count:$($NTP_IP_Count.Trim())"}
-
-        if ($NTP_More) {$Query += ' ntp.more:True'}
-
-        if ($NTP_Port) {$Query += " ntp.port:$($NTP_Port.Trim())"}
-
-        if ($Title) {$Query += " title:$($Title.Trim())"}
-
-        if ($Version) {$Query += " version:$($Version.Trim())"}
-
-        if ($Product) {$Query += " product:$($Product.Trim())"}
-
-        # Set propper request parameters.
-        $Body = @{'key'= $APIKey; 'query'= $Query}
-
-        if ($Page)
-        {
-            $Body.Add('page', $Page)
+        else {
+            $LocalQuery = @()
         }
-
-        if ($Offset)
-        {
-            $Body.Add('offset',$Offset)
-        }
-
-        if ($Limit)
-        {
-            $Body.Add('limit',$Limit)
-        }
-
-        if ($Minify)
-        {
-            $Body.Add('minify','True')
-        }
-        else
-        {
-            $Body.Add('minify','False')
-        }
-
-        if ($Facets)
-        {
-            $Body.Add('facets',$Facets)
-        }
-
-        # Start building parameters for REST Method invokation.
-        $Params =  @{}
-        $Params.add('Body', $Body)
-        $Params.add('Method', 'Get')
-        $Params.add('Uri',[uri]'https://api.shodan.io/shodan/host/search')
-
-        # Check if connection will be made thru a proxy.
-        if ($PsCmdlet.ParameterSetName -eq 'Proxy')
-        {
-            $Params.Add('Proxy', $Proxy)
-
-            if ($ProxyCredential)
-            {
-                $Params.Add('ProxyCredential', $ProxyCredential)
-            }
-
-            if ($ProxyUseDefaultCredentials)
-            {
-                $Params.Add('ProxyUseDefaultCredentials', $ProxyUseDefaultCredentials)
+        $QueryArray = foreach ($QueryDefinion in $QueryDefinionHash.GetEnumerator()) {
+            if ($PSBoundParameters.ContainsKey($QueryDefinion.Key)) {
+                Invoke-Command -ScriptBlock $QueryDefinion.Value
             }
         }
-
-        # Check if we will be doing certificate pinning by checking the certificate thumprint.
-        if ($CertificateThumbprint)
-        {
-            $Params.Add('CertificateThumbprint', $CertificateThumbprint)
+        $LocalQuery += $QueryArray
+        $Body = @{
+            'query' = ($LocalQuery -join ' ')
         }
+        if ($PSBoundParameters.ContainsKey('Minify') -and ($Minify -eq $true)) {
+            $Body['minify'] = 'True'
+        }
+        $InvokeParameters = @{
+            'Method'     = 'GET'
+            'Uri'        = 'https://api.shodan.io/shodan/host/search'
+            'Body'       = $Body
+        }
+        $InvokeParameters = Add-ShodanPassthroughParameter -FromHashtable $PSBoundParameters -ToHashTable $InvokeParameters
     }
-    Process
-    {
-       
-        $ReturnedObject = Invoke-RestMethod @Params
-        if ($ReturnedObject)
-        {
-            if ($ReturnedObject.total -ne 0)
-            {
-                $matches = @()
-                foreach($match in $ReturnedObject.matches)
-                {
-                    $match.pstypenames.insert(0,'Shodan.Host.Match')
-                    $matches = $matches + $match
+    process {
+        $ReturnedObject = Invoke-RestMethod @InvokeParameters
+        if ($ReturnedObject) {
+            if ($ReturnedObject.Total -ne 0) {
+                $FixedMatches = foreach ($Match in $ReturnedObject.Matches) {
+                    $Match.PSTypeNames.Insert(0, 'Shodan.Host.Match')
                 }
-
-                $properties = [ordered]@{
-                                'Total' = $ReturnedObject.total;
-                                'Matches' = $matches; 
-                                'Facets' = $ReturnedObject.facets
-                              }
-
-                $searchobj = [pscustomobject]$properties
-                $searchobj.pstypenames.insert(0,'Shodan.Host.Search')
-                $searchobj
+                [PSCustomObject]$SearchObject = [Ordered]@{
+                    'Total'   = $ReturnedObject.Total
+                    'Matches' = $FixedMatches
+                    'Facets'  = $ReturnedObject.Facets
+                }
+                $SearchObject.PSTypeNames.Insert(0, 'Shodan.Host.Search')
+                $SearchObject
             }
-            else
-            {
+            else {
                 Write-Warning -Message 'No matches found.'
             }
         }
     }
-    End 
-    {
+    end {
     }
 }
