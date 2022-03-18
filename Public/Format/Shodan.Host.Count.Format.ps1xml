@@ -2,15 +2,15 @@
 <Configuration>
 <ViewDefinitions>
 <View>
-    <Name>Shodan.Exploit.Count</Name>
+    <Name>Shodan.Host.Count</Name>
     <ViewSelectedBy>
-        <TypeName>Shodan.Exploit.Count</TypeName>
+        <TypeName>Shodan.Host.Count</TypeName>
     </ViewSelectedBy>
     <ListControl>
         <ListEntries>
             <ListEntry>
                 <ListItems>
-                    <ListItem> 
+                    <ListItem>
                         <Label>Total</Label>
                         <PropertyName>total</PropertyName>
                     </ListItem>

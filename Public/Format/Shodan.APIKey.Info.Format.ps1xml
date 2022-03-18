@@ -10,7 +10,7 @@
         <ListEntries>
             <ListEntry>
                 <ListItems>
-                    <ListItem> 
+                    <ListItem>
                         <Label>Unlocked_Left</Label>
                         <PropertyName>unlocked_left</PropertyName>
                     </ListItem>

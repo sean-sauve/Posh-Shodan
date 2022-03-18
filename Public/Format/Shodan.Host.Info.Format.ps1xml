@@ -10,7 +10,7 @@
         <ListEntries>
             <ListEntry>
                 <ListItems>
-                    <ListItem> 
+                    <ListItem>
                         <Label>IP_Str</Label>
                         <PropertyName>ip_str</PropertyName>
                     </ListItem>

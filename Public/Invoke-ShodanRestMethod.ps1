@@ -9,7 +9,7 @@ function Invoke-ShodanRestMethod {
         [String]
         $CertificateThumbprint,
 
-        [Parameter(ParameterSetName = 'Proxy', Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'Proxy')]
         [String]
         $Proxy,
 
@@ -59,7 +59,6 @@ function Invoke-ShodanRestMethod {
         [Int]
         $Limit
     )
-
     begin {
         if (!(Test-Path Variable:Global:ShodanApiKey ) -and !($PSBoundParameters.ContainsKey('ApiKey'))) {
             throw 'No Shodan API Key has been specified or set.'
