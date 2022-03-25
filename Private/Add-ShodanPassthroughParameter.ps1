@@ -16,8 +16,12 @@ function Add-ShodanPassthroughParameter {
             Proxy
             ProxyCredential
             ProxyUseDefaultCredentials
+            Facets
+            Page
+            Offet
+            Limit
         .EXAMPLE
-        Add-Hash -FromHashtable $fromHash -ToHashtable $toHash -KeyName @('MyKey1', 'MyKey2')
+        Add-ShodanPassthroughParameter -FromHashtable $fromHash -ToHashtable $toHash -KeyName @('MyKey1', 'MyKey2')
         .INPUTS
         Two hashtables and a string array.
         .OUTPUTS
